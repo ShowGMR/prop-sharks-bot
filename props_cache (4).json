@@ -1,0 +1,19 @@
+{
+    "LeBron James": {
+        "team": "LAL",
+        "stat": "Points",
+        "fanduel": 27.5,
+        "draftkings": 26.5,
+        "fd_odds": -110,
+        "dk_odds": -105
+    },
+    "Stephen Curry": {
+        "team": "GSW",
+        "stat": "Points",
+        "fanduel": 29.5,
+        "draftkings": 28.5,
+        "fd_odds": -115,
+        "dk_odds": -110
+    },
+    "_last_updated": "2025-06-15 02:04:53"
+}
