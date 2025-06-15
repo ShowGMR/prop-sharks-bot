@@ -1,34 +1,60 @@
+
 name: Daily Prop Scraper
 
 on:
   schedule:
-    - cron: '0 11 * * *'  # Runs daily at 7 AM EST (11 AM UTC)
-  workflow_dispatch:     # Enables manual runs from GitHub
+    - cron: '0 14 * * *'  # 10 AM EST daily
+  workflow_dispatch:
 
 jobs:
-  scrape-props:
+  run-scraper:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: ⬇️ Checkout Repo
       uses: actions/checkout@v3
 
-    - name: Set up Python
+    - name: 🔧 Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.11'
+        python-version: '3.x'
 
-    - name: Install dependencies
+    - name: 📦 Install Dependencies
       run: |
-        pip install -r requirements.txt || true
+        python -m pip install --upgrade pip
 
-    - name: Run scraper
-      run: python scraper.py
-
-    - name: Commit & push updated props
+    - name: 🚀 Run Scraper
       run: |
-        git config --global user.name "ShowGMR"
-        git config --global user.email "19naps@gmail.com"
+        python scraper.py
+
+    - name: 💾 Commit Cached Props
+      run: |
+        git config user.name "ShowGMR"
+        git config user.email "19naps@gmail.com"
         git add props_cache.json
-        git commit -m "🤖 Auto-update props" || echo "No changes"
-        git push
+        git commit -m "🗂️ Auto-update prop cache (2025-06-15 02:53:50 UTC)" || echo "No changes to commit"
+        git push origin main
+
+    - name: 📤 Notify Discord Webhook
+      run: |
+        curl -X POST \
+          -H "Content-Type: application/json" \
+          -d '{
+            "username": "📊 Prop Update Bot",
+            "avatar_url": "https://cdn-icons-png.flaticon.com/512/1384/1384060.png",
+            "embeds": [{
+              "title": "🧪 Daily Props Updated",
+              "description": "Your cached props have been refreshed and pushed to GitHub.",
+              "color": 5763719,
+              "fields": [
+                { "name": "🕒 Timestamp", "value": "2025-06-15 02:53:50 UTC", "inline": false },
+                { "name": "📁 Cache File", "value": "`props_cache.json`", "inline": true },
+                { "name": "🏈 Sports", "value": "NBA, NFL, MLB, NHL, WNBA, Soccer", "inline": true }
+              ],
+              "footer": {
+                "text": "PropSharks Auto Scraper",
+                "icon_url": "https://em-content.zobj.net/source/microsoft-teams/337/chart-increasing_1f4c8.png"
+              }
+            }]
+          }' \
+          https://discord.com/api/webhooks/1383639399790546995/ZnI3bHlOrlcRc9FKtHOkIsvTKASuJGoXYte_aoVLF2BwJ7sjWKhtxwLD2n0lyGqG7Ncp
